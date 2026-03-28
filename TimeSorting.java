@@ -1,115 +1,131 @@
 import java.util.*;
+import java.util.Random;
+import java.util.Arrays;
 
-class SortingPack {
-    // just in case you need tis method for testing
-    public static void main(String[] args) {
-        // something
+public class HeapMaxApp{
+	public static void main(String[] args) {
+		// in case if you want to test your solution
+
+    int[][] matrix = randomMatrix(100,100);
+    getKthBiggestNaive(matrix,3);
+    getKthBiggest(matrix,3);
+
+    //System.out.println(calcTime(matrix, 5,"getKthBiggestNaive"));
+    //System.out.println(calcTime(matrix, 5,"getKthBiggest"));
+	}
+
+  // return a 2D array with m rows and n columns
+  // the 2D array is sorted both row-wise and column-wise
+  public static int[][] randomMatrix(int m, int n) {
+    // placeholder
+    Random rand = new Random();
+    int[][] matrix = new int[m][n];
+    for(int j =0;j<m;j++){
+      for(int i =0;i<n;i++){
+        if(j==0){
+          matrix[j][i]= rand.nextInt(100000000);
+        }
+        else{
+          matrix[j][i]= rand.nextInt(matrix[j-1][i]+1); //matrix[j-1][i]+1
+        }
+
+      }
+      Arrays.sort((matrix[j]));
     }
+    for(int i =0;i<m;i++){
+      //System.out.println(Arrays.toString(matrix[i]));
+    }
+    return matrix;
+  }
 
-    // implementation of insertion sort
-    // parameters: int array arr
-    // return: the input array
+  // return the kth largest element from matr
+  // you can assume that k is between 1 and matr.length * matr[0].length
+  public static int getKthBiggestNaive(int[][] matr, int k) {
+    // remove this line
+    int m=matr.length;
+    int n =matr[0].length;
+    int arrLength=(n)*(m);
+    int arrIndex=0;
+    int kthLargest=0;
+    int[] arr= new int[arrLength];
+    for(int j =0;j<m;j++){
+      for(int i =0;i<n;i++){
+        
+        arr[arrIndex]=matr[j][i];
+        arrIndex++;
+      }
 
-    //pretty self explaninary, but it itererates through array, and compares each element to each element before it.
-    //and swap it if it's in the wrong place
-    public static int[] insertionSort(int[] arr) {
-        // keep this line
-        for (int i=0; i<arr.length; i++){
-            for (int j=i; j>0; j--){
-                if((arr[j-1]>arr[j])){
-                    int temp=arr[j-1];
-                    arr[j-1]=arr[j];
-                    arr[j]=temp;
-                }
+    }
+    insertionSort(arr);
+    for(int i=0;i<k;i++){
+      kthLargest=arr[arrLength-1-i];
+    }
+    
+    //System.out.println(Arrays.toString(arr));
+    //System.out.println(kthLargest);
+    
+    return kthLargest;
+  }
+  public static int[] insertionSort(int[] arr) {
+    // keep this line
+    for (int i=0; i<arr.length; i++){
+        for (int j=i; j>0; j--){
+            if((arr[j-1]>arr[j])){
+                int temp=arr[j-1];
+                arr[j-1]=arr[j];
+                arr[j]=temp;
             }
         }
-        return arr;
-    }
-            
-
-    // implementation of quick sort
-    // parameters: int array arr
-    // return: the input array
-
-    public static int[] quickSort(int[] arr) {
-        // keep this line
-        arr = quickSort(arr,arr.length,0);
-        return arr;
-    }
-    //quicksort sorts an array, finds a pivot, sorts arrays based off of which half is smaller
-    //and the proccess is done over and over for each sub array using recurssion
-    public static int[] quickSort(int[] arr, int partition,int start) {
-        if (start!=partition){
-        int pivot=arr[partition-1];
-        int bottomTracker=start;
-        for (int i=start; i<partition; i++){
-            if(arr[i]<=pivot){
-                int temp=arr[bottomTracker];
-                arr[bottomTracker]=arr[i];
-                arr[i]=temp;
-                bottomTracker++; 
-            }
-        }
-        quickSort(arr,bottomTracker-1,start);
-        quickSort(arr,partition,bottomTracker);
     }
     return arr;
+}
+
+  // return the kth largest element from matr
+  // you can assume that k is between 1 and matr.length * matr[0].length
+  public static int getKthBiggest(int[][] matr, int k) {
+    // remove this line
+    HeapMax heap = new HeapMax();
+    int m=matr.length;
+    int n =matr[0].length;
+    int arrLength=(n)*(m);
+    int arrIndex=0;
+    int kthLargest=0;
+    int[] arr= new int[arrLength];
+    for(int j =0;j<m;j++){
+      for(int i =0;i<n;i++){
+        
+        arr[arrIndex]=matr[j][i];
+        arrIndex++;
+      }
+
     }
 
-    // implementation of merge sort
-    // parameters: int array arr
-    // return: sorted int array
-    public static int[] mergeSort(int[] arr) {
-        // it's up to you what to return
-        // you can remove this line depending on your implementation
-        arr=mergeSort(arr,0,arr.length);
-        return arr;
-    }
-    public static int[] mergeSort(int[] arr,int start, int end) {
-        // it's up to you what to return
-        // you can remove this line depending on your implementation
+      heap.build(arr);
+      //heap.display();
+      for(int i=0;i<k;i++){
+        kthLargest=heap.removeMax();
+      }
+    //System.out.println(kthLargest);
+    return kthLargest;
+  }
 
-        //base case is that the end is only 1 greater than start
-        int partition=(start+end)/2;
-        int[] sortedArr = new int[arr.length];
-        if(!((end-start)<=1)){
+  // calculate the time it takes to find the kth largest element from matr
+  // algorithName is either getKthBiggest or getKthBiggestNaive
+  public static double calcTime(int[][] matr, int k, String algorithName) {
+    // remove this line
 
-            //nonbase case sub arrays are of length greater than 1
 
-            //subdivides it into 2 smaller arrays
-            //for each saves a head pointing at the left array and the right array
-            //and the logic esentially sorts the arrays into one array (stored not in place). It also
-            //deals with cases where one array sorts faster than the other
-            //and it does this for each iteration. So this means that we have nlogn steps because we do this iteration logn times
-            mergeSort(arr,start,partition);
-            mergeSort(arr,partition,end);
-            int leftHead=start;
-            int rightHead=partition;
-            for(int i=start; i<end; i++){
-                if(((rightHead<end)&&(leftHead<partition))){
-                    if(arr[leftHead]<arr[rightHead]){
-                        sortedArr[i]=arr[leftHead];
-                        leftHead++;
-                    }
-                    else{
-                        sortedArr[i]=arr[rightHead];
-                        rightHead++;
-                    }
-                }
-                else if(rightHead<end){
-                    sortedArr[i]=arr[rightHead];
-                        rightHead++;
-                }
-                else{
-                    sortedArr[i]=arr[leftHead];
-                        leftHead++;
-                }
-            }
-            for(int i=start; i<end; i++){
-                arr[i]=sortedArr[i];
-            }
-        }
-        return arr;
-    }
-    // you are welcome to add any supporting methods
+		long start=System.nanoTime();
+		if(algorithName.equals("getKthBiggest")){
+			getKthBiggest(matr,k);
+		}
+		
+		else if(algorithName.equals("getKthBiggestNaive")){
+			getKthBiggestNaive(matr,k);
+		}
+		long end=(System.nanoTime()-start)/1000;
+		
+		return end;
+
+  }
 }
